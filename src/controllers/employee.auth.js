@@ -88,7 +88,10 @@ exports.login = async (req, res, next) => {
     }
 
     res.status(200).json({
-      employee_id: rows[0].id,
+      message: "Login Success",
+      data: {
+        nik: args.nik,
+      },
     });
   } catch (error) {
     logger.error(error);

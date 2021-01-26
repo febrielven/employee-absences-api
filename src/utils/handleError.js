@@ -10,6 +10,7 @@ module.exports.handleError =  (error_code, errorMsg) => {
     const handle =  {
         error_code: error_code,
         message: errorMsg,
+        data:null,
     };
     return handle;
 };

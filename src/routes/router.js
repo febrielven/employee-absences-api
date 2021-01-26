@@ -19,7 +19,6 @@ module.exports = (app) => {
   // add employee absences
   app.post(
     "/api/employee_absences",
-    employeeValidation.setAbsences,
     employeeAuth.auth,
     absences.addAbsences
   );

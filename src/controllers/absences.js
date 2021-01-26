@@ -21,7 +21,10 @@ exports.getAll = async (req, res) => {
     let qStr = Absences.select();
     // excute query & get absences
     let rows = await asyncMiddleware.DBquery(qStr);
-    res.status(200).json(rows);
+    res.status(200).json({
+      message: "fetch Success",
+      data: rows,
+    });
   } catch (error) {
     logger.error(error);
     return res.status(500).send(handleError('SERVER_ERROR', 'Unknown error'));
@@ -38,7 +41,6 @@ exports.addAbsences = async (req, res) => {
         detail: errors.array(),
       });
     }
-
     // Create a Employee
     const argsEmp = new Employee({
       nik: req.body.nik,
@@ -90,7 +92,12 @@ exports.addAbsences = async (req, res) => {
     var qStr = Absences.selectByDate(args);
     // excute query
     var rows = await asyncMiddleware.DBQueryOne(qStr);
-    res.status(200).json(rows);
+    res.status(200).json(
+      {
+        message: "fetch Success",
+        data: rows,
+      }
+    );
   } catch (error) {
     logger.error(error);
     return res.status(500).send(handleError('SERVER_ERROR', 'Unknown error'));

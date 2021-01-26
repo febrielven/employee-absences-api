@@ -15,7 +15,7 @@ const Absences = function (args) {
  */
 Absences.select = () => {
   return {
-    query: 'SELECT * FROM absences order by created desc',
+    query: 'SELECT B.nik, B.fullname, A.date_in, A.date_out, A.selfie FROM absences A  JOIN employee B ON B.id = A.employee_id ORDER BY A.created DESC',
     args: [],
   };
 };

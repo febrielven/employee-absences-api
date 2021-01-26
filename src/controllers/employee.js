@@ -1,10 +1,10 @@
-const { validationResult } = require('express-validator');
-const passwordHash = require('password-hash');
+const { validationResult } = require("express-validator");
+const passwordHash = require("password-hash");
 
-const handleError = require('../utils/handleError').handleError;
-const logger = require('../utils/logger');
-const asyncMiddleware = require('../utils/asyncMiddleWare');
-const Employee = require('../models').Employee;
+const handleError = require("../utils/handleError").handleError;
+const logger = require("../utils/logger");
+const asyncMiddleware = require("../utils/asyncMiddleWare");
+const Employee = require("../models").Employee;
 
 // Get Employee
 exports.getAll = async (req, res) => {
@@ -12,7 +12,7 @@ exports.getAll = async (req, res) => {
   try {
     if (!errors.isEmpty()) {
       return res.status(422).json({
-        error_code: 'VALIDATION_ERROR',
+        error_code: "VALIDATION_ERROR",
         detail: errors.array(),
       });
     }
@@ -20,12 +20,13 @@ exports.getAll = async (req, res) => {
     let qStr = Employee.select();
     // excute query & get employee
     let rows = await asyncMiddleware.DBquery(qStr);
-    res.status(200).json(rows);
+    res.status(200).json({
+      message: "fetch Success",
+      data: rows,
+    });
   } catch (error) {
     logger.error(error);
-    return res
-      .status(500)
-      .send(handleError('SERVER_ERROR', 'Unknown error'));
+    return res.status(500).send(handleError("SERVER_ERROR", "Unknown error"));
   }
 };
 
@@ -35,7 +36,7 @@ exports.create = async (req, res) => {
   try {
     if (!errors.isEmpty()) {
       return res.status(422).json({
-        error_code: 'VALIDATION_ERROR',
+        error_code: "VALIDATION_ERROR",
         detail: errors.array(),
       });
     }
@@ -53,12 +54,15 @@ exports.create = async (req, res) => {
     //excute & save Employee
     let rows = await asyncMiddleware.DBquery(qStr);
 
-    res.status(200).json({ id: rows.insertId});
+    res.status(200).json({
+      message: "fetch Success",
+      data: {
+        id: rows.insertId,
+      },
+    });
   } catch (error) {
     logger.error(error);
-    return res
-      .status(500)
-      .send(handleError('SERVER_ERROR', 'Unknown error'));
+    return res.status(500).send(handleError("SERVER_ERROR", "Unknown error"));
   }
 };
 
@@ -68,7 +72,7 @@ exports.findOne = async (req, res) => {
   try {
     if (!errors.isEmpty()) {
       return res.status(422).json({
-        error_code: 'VALIDATION_ERROR',
+        error_code: "VALIDATION_ERROR",
         detail: errors.array(),
       });
     }
@@ -81,12 +85,13 @@ exports.findOne = async (req, res) => {
     //call query statement
     let qStr = Employee.selectOne(args);
     let rows = await asyncMiddleware.DBquery(qStr);
-    res.status(200).json(rows);
+    res.status(200).json({
+      message: "fetch Success",
+      data: rows[0],
+    });
   } catch (error) {
     logger.error(error);
-    return res
-      .status(500)
-      .send(handleError('SERVER_ERROR', 'Unknown error'));
+    return res.status(500).send(handleError("SERVER_ERROR", "Unknown error"));
   }
 };
 
@@ -96,7 +101,7 @@ exports.update = async (req, res) => {
   try {
     if (!errors.isEmpty()) {
       return res.status(422).json({
-        error_code: 'VALIDATION_ERROR',
+        error_code: "VALIDATION_ERROR",
         detail: errors.array(),
       });
     }
@@ -115,12 +120,13 @@ exports.update = async (req, res) => {
     //excute & update Employee
     let rows = await asyncMiddleware.DBQueryOne(qStr);
 
-    res.status(200).json({ id: args.id });
+    res.status(200).json({
+      message: "fetch Success",
+      data: { id: args.id },
+    });
   } catch (error) {
     logger.error(error);
-    return res
-      .status(500)
-      .send(handleError('SERVER_ERROR', 'Unknown error'));
+    return res.status(500).send(handleError("SERVER_ERROR", "Unknown error"));
   }
 };
 
@@ -130,7 +136,7 @@ exports.deleteOne = async (req, res) => {
   try {
     if (!errors.isEmpty()) {
       return res.status(422).json({
-        error_code: 'VALIDATION_ERROR',
+        error_code: "VALIDATION_ERROR",
         detail: errors.array(),
       });
     }
@@ -143,11 +149,12 @@ exports.deleteOne = async (req, res) => {
     //call query statement
     let qStr = Employee.deleteOne(args);
     let rows = await asyncMiddleware.DBquery(qStr);
-    res.status(200).json(rows);
+    res.status(200).json({
+      message: "fetch Success",
+      data: rows,
+    });
   } catch (error) {
     logger.error(error);
-    return res
-      .status(500)
-      .send(handleError('SERVER_ERROR', 'Unknown error'));
+    return res.status(500).send(handleError("SERVER_ERROR", "Unknown error"));
   }
 };
