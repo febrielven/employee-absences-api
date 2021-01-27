@@ -1,11 +1,14 @@
-const { validationResult } = require('express-validator');
-const handleError = require('../utils/handleError').handleError;
-const logger = require('../utils/logger');
-const asyncMiddleware = require('../utils/asyncMiddleWare');
-const formatDate = require('../utils/formatDate');
+const { validationResult } = require("express-validator");
+const handleError = require("../utils/handleError").handleError;
+const logger = require("../utils/logger");
+const asyncMiddleware = require("../utils/asyncMiddleWare");
+const formatDate = require("../utils/formatDate");
 
-const Employee = require('../models').Employee;
-const Absences = require('../models').Absences;
+const credentialAuth = require("../middleware/credentialAuth");
+const uploadBase64ToImage = require("../utils/upload");
+
+const Employee = require("../models").Employee;
+const Absences = require("../models").Absences;
 
 // Get ALL Absences
 exports.getAll = async (req, res) => {
@@ -13,7 +16,7 @@ exports.getAll = async (req, res) => {
   try {
     if (!errors.isEmpty()) {
       return res.status(422).json({
-        error_code: 'VALIDATION_ERROR',
+        error_code: "VALIDATION_ERROR",
         detail: errors.array(),
       });
     }
@@ -27,23 +30,20 @@ exports.getAll = async (req, res) => {
     });
   } catch (error) {
     logger.error(error);
-    return res.status(500).send(handleError('SERVER_ERROR', 'Unknown error'));
+    return res.status(500).send(handleError("SERVER_ERROR", "Unknown error"));
   }
 };
 
 // Add Absences
-exports.addAbsences = async (req, res) => {
-  const errors = validationResult(req);
+exports.addAbsences = async (req, res, next) => {
   try {
-    if (!errors.isEmpty()) {
-      return res.status(422).json({
-        error_code: 'VALIDATION_ERROR',
-        detail: errors.array(),
-      });
-    }
+    // Middleware
+    const users = await credentialAuth(req);
+    const image = await uploadBase64ToImage(req);
+
     // Create a Employee
     const argsEmp = new Employee({
-      nik: req.body.nik,
+      nik: users.username,
     });
 
     //call query Statement
@@ -54,7 +54,7 @@ exports.addAbsences = async (req, res) => {
     if (!rows[0]) {
       return res
         .status(400)
-        .send(handleError('NOT_FOUND_ERROR', 'Data tidak ditemukan'));
+        .send(handleError("NOT_FOUND_ERROR", "Data tidak ditemukan"));
     }
 
     // Create a Absences
@@ -62,12 +62,10 @@ exports.addAbsences = async (req, res) => {
       employee_id: rows[0].id,
       date_in: new Date(),
       date_out: new Date(),
-      selfie: req.body.selfie,
+      selfie: image,
       created: new Date(),
       now: formatDate.getDateString(new Date()),
     });
-    
-  
 
     //call query statement
     var qStr = Absences.selectByDate(args);
@@ -81,7 +79,6 @@ exports.addAbsences = async (req, res) => {
       // excute query
       await asyncMiddleware.DBQueryOne(qStr);
     } else {
-     
       //call query statement
       var qStr = Absences.insertAbsences(args);
       // excute query
@@ -92,14 +89,12 @@ exports.addAbsences = async (req, res) => {
     var qStr = Absences.selectByDate(args);
     // excute query
     var rows = await asyncMiddleware.DBQueryOne(qStr);
-    res.status(200).json(
-      {
-        message: "fetch Success",
-        data: rows,
-      }
-    );
+    res.status(200).json({
+      message: "fetch Success",
+      data: rows,
+    });
   } catch (error) {
     logger.error(error);
-    return res.status(500).send(handleError('SERVER_ERROR', 'Unknown error'));
+    return res.status(500).send(handleError("SERVER_ERROR", "Unknown error"));
   }
 };

@@ -6,7 +6,7 @@ const Absences = function (args) {
   this.date_out = args.date_out;
   this.selfie = args.selfie;
   this.created = args.created;
-  this.now  =args.now;
+  this.now = args.now;
 };
 
 /**
@@ -15,27 +15,26 @@ const Absences = function (args) {
  */
 Absences.select = () => {
   return {
-    query: 'SELECT B.nik, B.fullname, A.date_in, A.date_out, A.selfie FROM absences A  JOIN employee B ON B.id = A.employee_id ORDER BY A.created DESC',
+    query:
+      "SELECT B.nik, B.fullname, A.date_in, A.date_out, A.selfie FROM absences A  JOIN employee B ON B.id = A.employee_id ORDER BY A.created DESC",
     args: [],
   };
 };
 
-
 /**
  * @description select Models
-* @param {*} args
+ * @param {*} args
  * @param {string} employee_id
  * @param {Date} date
  * @return {Object} Return query for models
  */
 Absences.selectByDate = (args) => {
   return {
-    query: 'SELECT id, employee_id, date_in, date_out, created FROM absences WHERE employee_id = ? AND DATE(created) = ?',
-    args: [args.employee_id,args.now]
+    query:
+      "SELECT id, employee_id, date_in, date_out, selfie, created FROM absences WHERE employee_id = ? AND DATE(created) = ?",
+    args: [args.employee_id, args.now],
   };
 };
-
-
 
 /**
  * @description create Models
@@ -47,7 +46,8 @@ Absences.selectByDate = (args) => {
  */
 Absences.insertAbsences = (args) => {
   return {
-    query: 'INSERT INTO absences (employee_id, date_in, selfie, created) VALUES (?)',
+    query:
+      "INSERT INTO absences (employee_id, date_in, selfie, created) VALUES (?)",
     args: [args.employee_id, args.date_in, args.selfie, args.created],
   };
 };
@@ -61,8 +61,8 @@ Absences.insertAbsences = (args) => {
 Absences.updateDateOut = (args) => {
   return {
     query:
-      'UPDATE absences SET date_out = ? WHERE employee_id = ? AND DATE(created) = ?',
-    args: [args.date_out, args.employee_id, args.now],
+      "UPDATE absences SET date_out = ?, selfie=? WHERE employee_id = ? AND DATE(created) = ?",
+    args: [args.date_out, args.selfie, args.employee_id, args.now],
   };
 };
 

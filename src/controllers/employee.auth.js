@@ -1,32 +1,26 @@
-const { validationResult } = require("express-validator");
 const passwordHash = require("password-hash");
 const asyncMiddleware = require("../utils/asyncMiddleWare");
-const errorMsg = require("./employes.validation").errorMsg;
 const handleError = require("../utils/handleError").handleError;
 const logger = require("../utils/logger");
+
+const credentialAuth = require("../middleware/credentialAuth");
 
 const Employee = require("../models").Employee;
 
 // Authorization
 exports.auth = async (req, res, next) => {
   try {
-    if (
-      !req.headers.authorization ||
-      req.headers.authorization.indexOf("Basic ") === -1
-    ) {
-      throw new Error("Missing Authorization Header");
+    users = await credentialAuth(req);
+    if (!users) {
+      return res
+        .status(401)
+        .send(handleError("AUT_ERROR", "Missing Authorization Header"));
     }
-    // verify auth credentials
-    const base64Credentials = req.headers.authorization.split(" ")[1];
-    const credentials = Buffer.from(base64Credentials, "base64").toString(
-      "ascii"
-    );
-    const [username, password] = credentials.split(":");
 
     // Create a Employee
     const args = new Employee({
-      nik: username,
-      password: password,
+      nik: users.username,
+      password: users.password,
     });
 
     //call query Statement
@@ -50,7 +44,6 @@ exports.auth = async (req, res, next) => {
     }
   } catch (error) {
     logger.error(error);
-
     return res.status(500).send(handleError("SERVER_ERROR", "Unknown error"));
   }
 };

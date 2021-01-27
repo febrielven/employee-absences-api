@@ -2,8 +2,14 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require('cors');
+const fileUpload = require('express-fileupload');
 
 const app = express();
+
+// enable files upload
+app.use(fileUpload({
+  createParentPath: true
+}));
 
 // parse requests of content-type: application/json
 app.use(bodyParser.json());
