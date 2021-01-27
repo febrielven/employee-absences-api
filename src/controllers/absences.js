@@ -5,7 +5,10 @@ const asyncMiddleware = require("../utils/asyncMiddleWare");
 const formatDate = require("../utils/formatDate");
 
 const credentialAuth = require("../middleware/credentialAuth");
-const uploadBase64ToImage = require("../utils/upload");
+const {
+  uploadBase64ToImage,
+  convertImageToBase64,
+} = require("../utils/upload");
 
 const Employee = require("../models").Employee;
 const Absences = require("../models").Absences;
@@ -24,6 +27,9 @@ exports.getAll = async (req, res) => {
     let qStr = Absences.select();
     // excute query & get absences
     let rows = await asyncMiddleware.DBquery(qStr);
+
+    rows = await forEach(rows);
+    console.log("res");
     res.status(200).json({
       message: "fetch Success",
       data: rows,
@@ -35,7 +41,7 @@ exports.getAll = async (req, res) => {
 };
 
 // Add Absences
-exports.addAbsences = async (req, res, next) => {
+exports.addAbsences = async (req, res) => {
   try {
     // Middleware
     const users = await credentialAuth(req);
@@ -92,6 +98,37 @@ exports.addAbsences = async (req, res, next) => {
     res.status(200).json({
       message: "fetch Success",
       data: rows,
+    });
+  } catch (error) {
+    logger.error(error);
+    return res.status(500).send(handleError("SERVER_ERROR", "Unknown error"));
+  }
+};
+
+// Read Image with location file
+exports.readImage = async (req, res) => {
+  const errors = validationResult(req);
+  try {
+    if (!errors.isEmpty()) {
+      return res.status(422).json({
+        error_code: "VALIDATION_ERROR",
+        detail: errors.array(),
+      });
+    }
+
+    let location = req.body.location;
+    let base64 = await convertImageToBase64(location);
+    if (!base64) {
+      return res
+        .status(400)
+        .send(handleError("NOT_FOUND_ERROR", "Data tidak ditemukan"));
+    }
+
+    res.status(200).json({
+      message: "fetch Success",
+      data: {
+        image: base64,
+      },
     });
   } catch (error) {
     logger.error(error);

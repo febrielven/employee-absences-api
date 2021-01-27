@@ -1,5 +1,9 @@
 const fs = require("fs");
+const imageToBase64 = require("image-to-base64");
+const logger = require("../utils/logger");
+
 var ReadableData = require("stream").Readable;
+
 /**
  * Description. Generate randow number
  * @return {integer} Return random number.
@@ -26,10 +30,24 @@ const uploadBase64ToImage = async (req) => {
         resolve(filename);
       });
     } catch (error) {
-      console.log(error);
+      logger.error(error);
       reject(error);
     }
   });
 };
 
-module.exports = uploadBase64ToImage;
+const convertImageToBase64 = async (location) => {
+  return new Promise((resolve, reject) => {
+    imageToBase64(location) // Path to the image
+      .then((response) => {
+        resolve(response);
+      })
+      .catch((error) => {
+        logger.error(error);
+        reject(null);
+      });
+  });
+};
+
+module.exports.uploadBase64ToImage = uploadBase64ToImage;
+module.exports.convertImageToBase64 = convertImageToBase64;

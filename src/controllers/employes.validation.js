@@ -15,6 +15,7 @@ const errorMsg = {
   errUnknown: 'Unknown error',
   errInteger: 'Must be integer and larger than 0',
   errLimit: 'The limit must be 1, 5, 10, 20, or 50',
+  errLocation: 'location file tidak boleh kosong',
 };
 
 module.exports.errorMsg = errorMsg;
@@ -59,6 +60,12 @@ module.exports = {
     check(['selfie'])
       .notEmpty()
       .withMessage(errorMsg.errSelfie)
+  ],
+
+  readImage: [
+    check(['location'])
+      .notEmpty()
+      .withMessage(errorMsg.errLocation),
   ],
   
   updateEmployee: [

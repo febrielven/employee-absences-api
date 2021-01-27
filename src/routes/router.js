@@ -13,15 +13,13 @@ module.exports = (app) => {
 
   // Retrieve all absences
   app.get("/api/absences", absences.getAll);
+    // Read image  format base64
+  app.post("/api/read_image_base64", employeeValidation.readImage, absences.readImage);
 
   app.post("/api/employee_auth", employeeAuth.auth, employeeAuth.login);
 
   // add employee absences
-  app.post(
-    "/api/employee_absences",
-    employeeAuth.auth,
-    absences.addAbsences
-  );
+  app.post("/api/employee_absences", employeeAuth.auth, absences.addAbsences);
 
   // Retrieve all Employee
   app.get("/api/employee", employee.getAll);
