@@ -27,9 +27,7 @@ exports.getAll = async (req, res) => {
     let qStr = Absences.select();
     // excute query & get absences
     let rows = await asyncMiddleware.DBquery(qStr);
-
-    rows = await forEach(rows);
-    console.log("res");
+    
     res.status(200).json({
       message: "fetch Success",
       data: rows,
