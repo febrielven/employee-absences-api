@@ -38,14 +38,19 @@ const uploadBase64ToImage = async (req) => {
 
 const convertImageToBase64 = async (location) => {
   return new Promise((resolve, reject) => {
-    imageToBase64(location) // Path to the image
-      .then((response) => {
-        resolve(response);
-      })
-      .catch((error) => {
-        logger.error(error);
-        reject(null);
-      });
+    try {
+      imageToBase64(location) // Path to the image
+        .then((response) => {
+          resolve(response);
+        })
+        .catch((error) => {
+          logger.error(error);
+          reject(null);
+        });
+    } catch (error) {
+      logger.error(error);
+      resolve(null);
+    }
   });
 };
 

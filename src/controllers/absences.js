@@ -30,14 +30,13 @@ exports.getAll = async (req, res) => {
     
     res.status(200).json({
       message: "fetch Success",
-      data: rows,
+      data: await readBase64(rows),
     });
   } catch (error) {
     logger.error(error);
     return res.status(500).send(handleError("SERVER_ERROR", "Unknown error"));
   }
 };
-
 // Add Absences
 exports.addAbsences = async (req, res) => {
   try {
@@ -133,3 +132,19 @@ exports.readImage = async (req, res) => {
     return res.status(500).send(handleError("SERVER_ERROR", "Unknown error"));
   }
 };
+
+
+
+async function readBase64 (rows){
+  for (let i = 0; i < rows.length; i++) {
+    const selfie = rows[i].selfie;
+    let base64 = await convertImageToBase64(selfie);
+    if (!base64) {
+      rows[i].selfie = null;
+    }else{
+      rows[i].selfie = base64;
+    }
+  }
+
+  return rows;
+}
